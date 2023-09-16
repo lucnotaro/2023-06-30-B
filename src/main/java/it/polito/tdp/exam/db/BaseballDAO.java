@@ -67,6 +67,84 @@ public class BaseballDAO {
 			throw new RuntimeException("Error Connection Database");
 		}
 	}
+	
+	public List<String> getTeams() {
+		String sql = "SELECT DISTINCT t.name "
+				+ "FROM teams t "
+				+ "ORDER BY t.name ASC";
+		List<String> result = new ArrayList<>();
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getString("name"));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public List<Integer> getYearsOf(String team) {
+		String sql = "SELECT DISTINCT t.year "
+				+ "FROM teams t "
+				+ "WHERE t.name=? "
+				+ "ORDER BY t.year ASC";
+		List<Integer> result = new ArrayList<>();
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1,team);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getInt("year"));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public Integer getTotSalaryOfIn(String team,Integer year) {
+		String sql = "SELECT SUM(s.salary) AS sum "
+				+ "FROM salaries s,teams t "
+				+ "WHERE s.year=t.year AND t.year=? AND t.name=? AND s.teamID=t.ID";
+		Integer result=0;
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1,year);
+			st.setString(2,team);
+			ResultSet rs = st.executeQuery();
+
+			rs.next();
+				result=rs.getInt("sum");
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+
 
 	// =================================================================
 	// ==================== HELPER FUNCTIONS =========================
